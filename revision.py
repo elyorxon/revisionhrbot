@@ -52,15 +52,15 @@ def error_handler(update, context):
 
 
 PORT = int(os.environ.get('PORT', '8443'))
-TOKEN = "5796090686:AAHG6dj8LDOa3PrFX10a6LISBYPnvJKrxpg"
+TOKEN = "6156512482:AAFnQCPRbKFNCyFO3yHqFn32qPpt-MzrOtQ"
 
-NAME, AGE, STACK, EXPERIENCE, PORTFOLIO, PRAY, WHY, CV = range(8)
+NAME, PHONE, PLACE, AGE, STACK, EXPERIENCE, PORTFOLIO, PURPOSE, WHY, CV = range(10)
 
 
 def start(update, context):
     user_name = update.message.from_user.first_name
     update.message.reply_html(
-        "Xush kelibsiz 😊. 'Sifr Edu' oilasiga qo’shilish niyatida kelgansiz"
+        "Xush kelibsiz 😊. 'ReVision' oilasiga qo’shilish niyatida kelgansiz"
         " degan umiddamiz. Iltimos ariza muvafaqqiyatli yakun topishi uchun so’ralgan "
         " barcha ma’lumotlarni oxirigacha va to’g’ri kiriting. Birinchi navbatda familya va ismingizni yozib "
         " jo'nating. "
@@ -70,6 +70,34 @@ def start(update, context):
 
 
 def get_name(update, context):
+    """ Get the name of user """
+    user = update.message.from_user
+    logger.info("Name of %s: %s", user.first_name, update.message.text)
+    context.user_data[NAME] = update.message.text
+    contact_keyboard = KeyboardButton(text="📞Telefon raqam ulashish", request_contact=True)
+    custom_keyboard = [[contact_keyboard]]
+    reply_markup = ReplyKeyboardMarkup(custom_keyboard, resize_keyboard=True, one_time_keyboard=True)
+    update.message.reply_html(
+        "Ajoyib 🤩 Siz bilan aloqaga chiqishimiz uchun telefon raqamingizni yozib qoldiring (+998xx-xxx-xx),"
+        " yoki pastdagi tugmacha ustiga bosib telefon raqamingizni tasdiqlang 😊 ".format(user.first_name),
+        reply_markup=reply_markup
+    )
+    return PHONE
+
+def get_phone(update, context):
+    context.user_data[PHONE] = update.message.text or update.effective_message.contact.phone_number
+    logger.info("Phone number of %s: %s", update.message.text)
+
+    andoza = '^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$'
+    phone_number = context.user_data[PHONE]
+
+    keyboards = [["Toshkent shahri", "Andijon", "Buxoro"],
+                 ["Farg'ona", "Jizzax", "Namangan"],
+                 ["Navoiy", "Samarqand", "Sirdaryo"],
+                 ["Surxandaryo", "Qashqadaryo", "Toshkent viloyati"],
+                 ["Qoraqalpog'iston Respublikasi", "Xorazm"]]
+    places = ReplyKeyboardMarkup(keyboards, resize_keyboard=True)
+
     context.user_data[NAME] = update.message.text
     age = [["<18", "18-25", "25<"]]
     reply_markup = ReplyKeyboardMarkup(age, resize_keyboard=True, one_time_keyboard=True)
