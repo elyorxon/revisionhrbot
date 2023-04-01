@@ -54,13 +54,13 @@ def error_handler(update, context):
 PORT = int(os.environ.get('PORT', '8443'))
 TOKEN = "6156512482:AAFnQCPRbKFNCyFO3yHqFn32qPpt-MzrOtQ"
 
-NAME, PHONE, PLACE, AGE, STACK, EXPERIENCE, PORTFOLIO, PURPOSE, WHY, CV = range(10)
+NAME, PHONE, LOCATION, AGE, WORKTYPE, STACK, EDUCATION, EXPERIENCE, PORTFOLIO, LANGUAGE, PURPOSE, WHY, CV = range(12)
 
 
 def start(update, context):
     user_name = update.message.from_user.first_name
     update.message.reply_html(
-        "Xush kelibsiz 😊. 'ReVision' oilasiga qo’shilish niyatida kelgansiz"
+        "Xush kelibsiz 😊. <b>'ReVision'</b> oilasiga qo’shilish niyatida kelgansiz"
         " degan umiddamiz. Iltimos ariza muvafaqqiyatli yakun topishi uchun so’ralgan "
         " barcha ma’lumotlarni oxirigacha va to’g’ri kiriting. Birinchi navbatda familya va ismingizni yozib "
         " jo'nating. "
@@ -84,21 +84,42 @@ def get_name(update, context):
     )
     return PHONE
 
+
 def get_phone(update, context):
     context.user_data[PHONE] = update.message.text or update.effective_message.contact.phone_number
     logger.info("Phone number of %s: %s", update.message.text)
 
     andoza = '^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$'
     phone_number = context.user_data[PHONE]
+    if re.match(andoza, phone_number):
+        user = update.message.from_user
 
-    keyboards = [["Toshkent shahri", "Andijon", "Buxoro"],
-                 ["Farg'ona", "Jizzax", "Namangan"],
-                 ["Navoiy", "Samarqand", "Sirdaryo"],
-                 ["Surxandaryo", "Qashqadaryo", "Toshkent viloyati"],
-                 ["Qoraqalpog'iston Respublikasi", "Xorazm"]]
-    places = ReplyKeyboardMarkup(keyboards, resize_keyboard=True)
+        places = [["Andijon viloyati", "Buxoro viloyati"],
+                  ["Farg'ona viloyati", "Jizzax viloyati"],
+                  ["Namangan viloyati", "Navoiy viloyati"],
+                  ["Qashqadaryo viloyati", "Samarqand viloyati"],
+                  ["Sirdaryo viloyati", "Surxondaryo viloyati"],
+                  ["Toshkent viloyati", "Xorazm viloyati"],
+                  ["Toshkent shahri", "Qoraqalpog'iston Respublikasi"]]
+        reply_markup = ReplyKeyboardMarkup(places, resize_keyboard=True, one_time_keyboard=True)
 
-    context.user_data[NAME] = update.message.text
+        update.message.reply_html(
+            '<b>{}</b>,🏢 hozirgi kunda qayerda istiqomat qilasiz? Tanlang👇:'.format(user.first_name),
+            reply_markup=reply_markup
+        )
+    else:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Iltimos, to'g'ri formatdagi telefon raqam kiriting!",
+
+        )
+    return LOCATION
+
+
+
+def get_location(update, context):
+
+    context.user_data[LOCATION] = update.message.text
     age = [["<18", "18-25", "25<"]]
     reply_markup = ReplyKeyboardMarkup(age, resize_keyboard=True, one_time_keyboard=True)
     update.message.reply_html("Yosh oralig'ingizni tanlang!", reply_markup=reply_markup)
@@ -108,6 +129,15 @@ def get_phone(update, context):
 
 def get_age(update, context):
     context.user_data[AGE] = update.message.text
+    worktype = ["Onlayn", "On-site (ishxonada)", "Aralash"]
+    reply_markup = ReplyKeyboardMarkup(worktype, resize_keyboard=True, one_time_keyboard=True)
+    update.message.reply_html("Qaysi ishlash uslubi siz uchun qulay?", reply_markup=reply_markup)
+
+    return WORKTYPE
+
+
+def get_worktype(update, context):
+    context.user_data[WORKTYPE] = update.message.text
     stack = [["Back-End developer: Python, Django"],
              ["Front-End developer: React.Js"],
              ["Mobile developer: Java"],
@@ -123,6 +153,7 @@ def get_age(update, context):
 
 def get_stack(update, context):
     context.user_data[STACK] = update.message.text
+    return EDUCATION
     experience = [["0-6 oy", "6 oy - 1 yil"],
                   ["1 - 2 yil", "2 yildan ko'proq"]]
     reply_markup = ReplyKeyboardMarkup(experience, resize_keyboard=True, one_time_keyboard=True)
