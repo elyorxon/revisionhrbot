@@ -228,9 +228,9 @@ def get_cv(update, context):
                           \n 👤Nomzod havolasi: {user.link, user.full_name}
                               '''
     file_id = update.message.document.file_id
-    context.bot.send_document(chat_id=50646151, document=file_id, caption=talabgor)
+    context.bot.send_document(chat_id=-978933128, document=file_id, caption=talabgor)
 
-#-978933128
+#
 
 
 def cancel(update: Update, context: CallbackContext):
