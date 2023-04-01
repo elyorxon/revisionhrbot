@@ -1,11 +1,11 @@
 import os
 import logging
-import datetime as dt
+
 import re
 import html
 import json
 import traceback
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, KeyboardButton
+from telegram import ReplyKeyboardMarkup, Update, KeyboardButton
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -129,7 +129,7 @@ def get_location(update, context):
 
 def get_age(update, context):
     context.user_data[AGE] = update.message.text
-    worktype = ["Onlayn", "On-site (ishxonada)", "Aralash"]
+    worktype = [["Onlayn", "Ofisda", "Aralash"]]
     reply_markup = ReplyKeyboardMarkup(worktype, resize_keyboard=True, one_time_keyboard=True)
     update.message.reply_html("Qaysi ishlash uslubi siz uchun qulay?", reply_markup=reply_markup)
 
@@ -183,8 +183,6 @@ def get_experience(update, context):
 
 def get_portfolio(update, context):
     context.user_data[PORTFOLIO] = update.message.text
-
-
     update.message.reply_html("Maqsadingiz nima? Qisqacha yozib yuboring.")
     return PURPOSE
 
@@ -208,24 +206,26 @@ def get_cv(update, context):
     context.user_data[CV] = update.message.document.file_id
 
     user = update.effective_user
-    file_id = update.message.document.file_id
-    context.bot.send_document(chat_id=-978933128, document=file_id)
-
     talabgor = f'''\n\n👤Nomzod ismi: {user.first_name, user.last_name}
-                       \n👤Ismi: {context.user_data[NAME]}
-                       \n📅Yosh toifasi: {context.user_data[AGE]}
-                       \nStack: {context.user_data[STACK]} 
-                       \nTajribasi: {context.user_data[EXPERIENCE]} 
-                       \nNima uchun: {context.user_data[WHY]}
-                       \nPMaqsadi: {context.user_data[PURPOSE]}
-                       \nPortfolio: {context.user_data[PORTFOLIO]}
-                       
-                       \n 👤Nomzod havolasi: {user.link, user.full_name}
-                           '''
-    context.bot.send_message(chat_id=-978933128,
-                             text=talabgor,
-                             parse_mode='HTML'
-                             )
+                          \n👤Ismi: {context.user_data[NAME]}
+                          \n Telefon raqami: {context.user_data[PHONE]}
+                          \n Yashash manzili: {context.user_data[LOCATION]}
+                          \n📅Yosh toifasi: {context.user_data[AGE]}
+                          \n Ishlash turi: {context.user_data[WORKTYPE]}
+                          \nStack: {context.user_data[STACK]} 
+                          \n Ma'lumoti:  {context.user_data[EDUCATION]}
+                          \n Chet tili:  {context.user_data[LANGUAGE]}
+                           \n Ish tajribasi:  {context.user_data[EXPERIENCE]}
+                           \nPortfolio: {context.user_data[PORTFOLIO]}
+                           \nMaqsadi: {context.user_data[PURPOSE]}
+                          \nNima uchun: {context.user_data[WHY]}
+
+
+                          \n 👤Nomzod havolasi: {user.link, user.full_name}
+                              '''
+    file_id = update.message.document.file_id
+    context.bot.send_document(chat_id=-978933128, document=file_id, caption=talabgor, parse_mode='HTML')
+
 
     update.message.reply_html(
         "Tashakkur. Sizning arizangiz qabul qilindi. Agar nomzodlar orasidan bizga ma'qul kelsangiz"
@@ -258,7 +258,7 @@ def main():
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
-    NAME, PHONE, LOCATION, AGE, WORKTYPE, STACK, EDUCATION, LANGUAGE, EXPERIENCE, PORTFOLIO, PURPOSE, WHY, CV
+
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start, run_async=True)],
         states={
@@ -271,7 +271,7 @@ def main():
                                                     'Toshkent shahri|Qoraqalpog\'iston Respublikasi)$'),
                                       get_location, pass_user_data=True)],
             AGE: [MessageHandler(Filters.regex('^(<18|18-25|25<)$'), get_age, pass_user_data=True)],
-            WORKTYPE: [MessageHandler(Filters.regex("^(Onlayn|On-site (ishxonada)|Aralash)$"), get_worktype, pass_user_data=True)],
+            WORKTYPE: [MessageHandler(Filters.regex("^(Onlayn|Ofisda|Aralash)$"), get_worktype, pass_user_data=True)],
             STACK: [MessageHandler(Filters.regex('^(Back-End developer: Python, Django|Front-End developer: React.Js|'
                                                  'Mobile developer: Flutter, Java|Back-End developer: C#, .NET|'
                                                  'Front-End developer: Vue.JS|Mobile developer: Java)$'), get_stack, pass_user_data=True)],
