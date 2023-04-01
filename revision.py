@@ -214,19 +214,17 @@ def get_cv(update, context):
     user = update.effective_user
     talabgor = f'''\n\n👤Nomzod ismi: {user.first_name, user.last_name}
                           \n👤Ismi: {context.user_data[NAME]}
-                          \n Telefon raqami: {context.user_data[PHONE]}
-                          \n Yashash manzili: {context.user_data[LOCATION]}
+                          \n📞Telefon raqami: {context.user_data[PHONE]}
+                          \n🗺Yashash manzili: {context.user_data[LOCATION]}
                           \n📅Yosh toifasi: {context.user_data[AGE]}
-                          \n Ishlash turi: {context.user_data[WORKTYPE]}
-                          \nStack: {context.user_data[STACK]}
-                          \n Ma'lumoti:  {context.user_data[EDUCATION]}
-                          \n Chet tili:  {context.user_data[LANGUAGE]}
-                           \n Ish tajribasi:  {context.user_data[EXPERIENCE]}
-                           \nPortfolio: {context.user_data[PORTFOLIO]}
-                           \nMaqsadi: {context.user_data[PURPOSE]}
-                          \nNima uchun: {context.user_data[WHY]}
-
-
+                          \n🏢Ishlash turi: {context.user_data[WORKTYPE]}
+                          \n👨🏻‍💻Stack: {context.user_data[STACK]}
+                          \n🎓 Ma'lumoti:  {context.user_data[EDUCATION]}
+                          \n🇺🇸Chet tili:  {context.user_data[LANGUAGE]}
+                           \n💼Ish tajribasi:  {context.user_data[EXPERIENCE]}
+                           \n🔗Portfolio: {context.user_data[PORTFOLIO]}
+                           \n📈Maqsadi: {context.user_data[PURPOSE]}
+                          \n🙋🏻‍♂️Nima uchun: {context.user_data[WHY]}
                           \n 👤Nomzod havolasi: {user.link, user.full_name}
                               '''
     file_id = update.message.document.file_id
