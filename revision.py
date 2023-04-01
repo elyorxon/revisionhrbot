@@ -54,7 +54,7 @@ def error_handler(update, context):
 PORT = int(os.environ.get('PORT', '8443'))
 TOKEN = "6156512482:AAFnQCPRbKFNCyFO3yHqFn32qPpt-MzrOtQ"
 
-NAME, PHONE, LOCATION, AGE, WORKTYPE, STACK, EDUCATION, EXPERIENCE, PORTFOLIO, LANGUAGE, PURPOSE, WHY, CV = range(12)
+NAME, PHONE, LOCATION, AGE, WORKTYPE, STACK, EDUCATION, LANGUAGE, EXPERIENCE, PORTFOLIO, PURPOSE, WHY, CV = range(13)
 
 
 def start(update, context):
@@ -145,7 +145,7 @@ def get_worktype(update, context):
              ["Mobile developer: Flutter, Java"],
              ["Front-End developer: Vue.JS"]]
     reply_markup = ReplyKeyboardMarkup(stack, resize_keyboard=True, one_time_keyboard=True)
-    update.message.reply_html("O'zingiz ustozlik qilmoqchi bo'lgan <b>yo'nalishni</b> tanlang!",
+    update.message.reply_html("Siz qaysi  <b>yo'nalishda</b> ishlaysiz?",
                               reply_markup=reply_markup)
 
     return STACK
@@ -153,8 +153,20 @@ def get_worktype(update, context):
 
 def get_stack(update, context):
     context.user_data[STACK] = update.message.text
+    update.message.reply_html("Dasturlashni qayerda o'rgangansiz? Qaysi o'quv markazi yoki kurs? Yozib yuboring.")
+
     return EDUCATION
-    experience = [["0-6 oy", "6 oy - 1 yil"],
+
+def get_education(update, context):
+    context.user_data[EDUCATION] = update.message.text
+    update.message.reply_html("Qaysi chet tilini qay darajada bilasiz? Misol uchun: English- B2 yoki bilmayman, shu formatda yozing.")
+    return LANGUAGE
+
+
+def get_language(update, context):
+    context.user_data[LANGUAGE] = update.message.text
+    experience = [["Tajribam yo'q"],
+                  ["3-6 oy", "6 oy - 1 yil"],
                   ["1 - 2 yil", "2 yildan ko'proq"]]
     reply_markup = ReplyKeyboardMarkup(experience, resize_keyboard=True, one_time_keyboard=True)
     update.message.reply_html("Tijoriy loyihalarda <b>ish tajribangiz</b> qancha?", reply_markup=reply_markup)
@@ -171,16 +183,14 @@ def get_experience(update, context):
 
 def get_portfolio(update, context):
     context.user_data[PORTFOLIO] = update.message.text
-    pray = [["✅Ha", "❌Yo'q"]]
-    reply_markup = ReplyKeyboardMarkup(pray, resize_keyboard=True, one_time_keyboard=True)
-    update.message.reply_html("Namoz o'qiysizmi?", reply_markup=reply_markup)
-    return PRAY
 
 
+    update.message.reply_html("Maqsadingiz nima? Qisqacha yozib yuboring.")
+    return PURPOSE
 
 
-def get_pray(update, context):
-    context.user_data[PRAY] = update.message.text
+def get_purpose(update, context):
+    context.user_data[PURPOSE] = update.message.text
     update.message.reply_html(
         "<b>Nima uchun</b> aynan sizni ishga qabul qilishimiz kerak? Javobingizni yozib yuboring!")
 
@@ -196,23 +206,23 @@ def get_why_text(update, context):
 
 def get_cv(update, context):
     context.user_data[CV] = update.message.document.file_id
-    now = dt.datetime.now()
+
     user = update.effective_user
     file_id = update.message.document.file_id
-    context.bot.send_document(chat_id=-876750276, document=file_id)
-    date_time = now.strftime("%m/%d/%Y, %H:%M")
+    context.bot.send_document(chat_id=-978933128, document=file_id)
+
     talabgor = f'''\n\n👤Nomzod ismi: {user.first_name, user.last_name}
                        \n👤Ismi: {context.user_data[NAME]}
                        \n📅Yosh toifasi: {context.user_data[AGE]}
                        \nStack: {context.user_data[STACK]} 
                        \nTajribasi: {context.user_data[EXPERIENCE]} 
-                       \nWhy: {context.user_data[WHY]}
-                       \nPray: {context.user_data[PRAY]}
+                       \nNima uchun: {context.user_data[WHY]}
+                       \nPMaqsadi: {context.user_data[PURPOSE]}
                        \nPortfolio: {context.user_data[PORTFOLIO]}
-                       \n📆 Hujjat jo'natilgan vaqt: {date_time}
+                       
                        \n 👤Nomzod havolasi: {user.link, user.full_name}
                            '''
-    context.bot.send_message(chat_id=-876750276,
+    context.bot.send_message(chat_id=-978933128,
                              text=talabgor,
                              parse_mode='HTML'
                              )
@@ -248,18 +258,28 @@ def main():
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
-
+    NAME, PHONE, LOCATION, AGE, WORKTYPE, STACK, EDUCATION, LANGUAGE, EXPERIENCE, PORTFOLIO, PURPOSE, WHY, CV
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start, run_async=True)],
         states={
             NAME: [MessageHandler(Filters.text, get_name, pass_user_data=True)],
+            PHONE: [MessageHandler(Filters.text | Filters.contact, get_phone, pass_user_data=True)],
+            LOCATION: [MessageHandler(Filters.regex("^(Andijon viloyati|Buxoro viloyati|Farg'ona viloyati|"
+                                                    'Jizzax viloyati|Namangan viloyati|Navoiy viloyati|'
+                                                    'Qashqadaryo viloyati|Samarqand viloyati|Sirdaryo viloyati|'
+                                                    'Surxondaryo viloyati|Toshkent viloyati|Xorazm viloyati|'
+                                                    'Toshkent shahri|Qoraqalpog\'iston Respublikasi)$'),
+                                      get_location, pass_user_data=True)],
             AGE: [MessageHandler(Filters.regex('^(<18|18-25|25<)$'), get_age, pass_user_data=True)],
+            WORKTYPE: [MessageHandler(Filters.regex("^(Onlayn|On-site (ishxonada)|Aralash)$"), get_worktype, pass_user_data=True)],
             STACK: [MessageHandler(Filters.regex('^(Back-End developer: Python, Django|Front-End developer: React.Js|'
                                                  'Mobile developer: Flutter, Java|Back-End developer: C#, .NET|'
                                                  'Front-End developer: Vue.JS|Mobile developer: Java)$'), get_stack, pass_user_data=True)],
-            EXPERIENCE: [MessageHandler(Filters.regex('^(0-6 oy|6 oy - 1 yil|1 - 2 yil|2 yildan ko\'proq)$'), get_experience, pass_user_data=True)],
+            EDUCATION: [MessageHandler(Filters.text, get_education, pass_user_data=True)],
+            LANGUAGE: [MessageHandler(Filters.text, get_language, pass_user_data=True)],
+            EXPERIENCE: [MessageHandler(Filters.regex('^(Tajribam yo\'q|3-6 oy|6 oy - 1 yil|1 - 2 yil|2 yildan ko\'proq)$'), get_experience, pass_user_data=True)],
             PORTFOLIO: [MessageHandler(Filters.text, get_portfolio, pass_user_data=True)],
-            PRAY: [MessageHandler(Filters.regex('^(✅Ha|❌Yo\'q)$'), get_pray, pass_user_data=True)],
+            PURPOSE: [MessageHandler(Filters.text, get_purpose, pass_user_data=True)],
             WHY: [MessageHandler(Filters.text, get_why_text, pass_user_data=True)],
             CV: [MessageHandler(Filters.document, get_cv, pass_user_data=True)],
 
