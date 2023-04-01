@@ -189,6 +189,7 @@ def get_portfolio(update, context):
 
 def get_purpose(update, context):
     context.user_data[PURPOSE] = update.message.text
+
     update.message.reply_html(
         "<b>Nima uchun</b> aynan sizni ishga qabul qilishimiz kerak? Javobingizni yozib yuboring!")
 
@@ -204,7 +205,12 @@ def get_why_text(update, context):
 
 def get_cv(update, context):
     context.user_data[CV] = update.message.document.file_id
+    update.message.reply_html(
+        "Tashakkur. Sizning arizangiz qabul qilindi. Agar nomzodlar orasidan bizga ma'qul kelsangiz"
+        " o'zimiz aloqaga chiqamiz.")
 
+#
+# def send_document_to_the_group(update, context):
     user = update.effective_user
     talabgor = f'''\n\n👤Nomzod ismi: {user.first_name, user.last_name}
                           \n👤Ismi: {context.user_data[NAME]}
@@ -212,7 +218,7 @@ def get_cv(update, context):
                           \n Yashash manzili: {context.user_data[LOCATION]}
                           \n📅Yosh toifasi: {context.user_data[AGE]}
                           \n Ishlash turi: {context.user_data[WORKTYPE]}
-                          \nStack: {context.user_data[STACK]} 
+                          \nStack: {context.user_data[STACK]}
                           \n Ma'lumoti:  {context.user_data[EDUCATION]}
                           \n Chet tili:  {context.user_data[LANGUAGE]}
                            \n Ish tajribasi:  {context.user_data[EXPERIENCE]}
@@ -224,16 +230,9 @@ def get_cv(update, context):
                           \n 👤Nomzod havolasi: {user.link, user.full_name}
                               '''
     file_id = update.message.document.file_id
-    context.bot.send_document(chat_id=-978933128, document=file_id, caption=talabgor, parse_mode='HTML')
+    context.bot.send_document(chat_id=50646151, document=file_id, caption=talabgor)
 
-
-    update.message.reply_html(
-        "Tashakkur. Sizning arizangiz qabul qilindi. Agar nomzodlar orasidan bizga ma'qul kelsangiz"
-        " o'zimiz aloqaga chiqamiz.")
-
-
-    return ConversationHandler.END
-
+#-978933128
 
 
 def cancel(update: Update, context: CallbackContext):
